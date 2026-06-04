@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: jmeter-demo
+
+spec:
+  containers:
+  - name: jmeter
+    image: localhost/my-jmeter:latest
+    imagePullPolicy: IfNotPresent

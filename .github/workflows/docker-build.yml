@@ -1,4 +1,4 @@
-name: Build And Test Docker
+name: Build Run And Push JMeter
 
 on:
   workflow_dispatch:
@@ -17,9 +17,6 @@ jobs:
     - name: Show Current Folder
       run: pwd
 
-    - name: Show Workspace Structure
-      run: tree /F
-
     - name: Show Files
       run: dir
 
@@ -31,3 +28,15 @@ jobs:
 
     - name: Verify Image
       run: docker images
+
+    - name: Run JMeter Container
+      run: docker run --rm jmeter-demo:v1
+
+    - name: Tag Image For GHCR
+      run: docker tag jmeter-demo:v1 ghcr.io/praveennageswaran/jmeter-demo:v1
+
+    - name: Login To GHCR
+      run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u PraveenNageswaran --password-stdin
+
+    - name: Push Image To GHCR
+      run: docker push ghcr.io/praveennageswaran/jmeter-demo:v1

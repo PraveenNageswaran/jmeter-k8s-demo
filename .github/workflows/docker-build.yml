@@ -1,0 +1,24 @@
+name: Build And Test Docker
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Show Files
+      run: dir
+
+    - name: Build Docker Image
+      run: docker build -t jmeter-demo:v1 .
+
+    - name: Verify Image
+      run: docker images

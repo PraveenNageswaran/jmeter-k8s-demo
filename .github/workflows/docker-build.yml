@@ -1,12 +1,6 @@
 name: Build Run And Push JMeter
-
-on:
-workflow_dispatch:
-
-jobs:
-build:
-runs-on: self-hosted
-
+on: workflow_dispatch:
+jobs: build: runs-on: self-hosted
 steps:
   - name: Checkout Repository
     uses: actions/checkout@v4
@@ -21,27 +15,8 @@ steps:
         Start-Sleep -Seconds 20
       }
 
-  - name: Ensure Docker Is Ready
-    run: |
-      $maxAttempts = 6
-
-      for ($i = 1; $i -le $maxAttempts; $i++) {
-
-        docker version
-
-        if ($LASTEXITCODE -eq 0) {
-          Write-Host "Docker is ready"
-          break
-        }
-
-        Write-Host "Waiting for Docker..."
-        Start-Sleep -Seconds 10
-
-        if ($i -eq $maxAttempts) {
-          Write-Host "Docker failed to start"
-          exit 1
-        }
-      }
+  - name: Verify Docker
+    run: docker version
 
   - name: Build Docker Image
     run: docker build -t jmeter-demo:v1 .

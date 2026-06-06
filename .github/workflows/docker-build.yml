@@ -9,59 +9,60 @@ runs-on: self-hosted
 
 ```
 steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-- name: Checkout Repository
-  uses: actions/checkout@v4
+  - name: Start Docker Service
+    run: |
+      $service = Get-Service com.docker.service -ErrorAction SilentlyContinue
 
-- name: Start Docker Service
-  run: |
-    $service = Get-Service com.docker.service -ErrorAction SilentlyContinue
-
-    if ($service -and $service.Status -ne 'Running') {
-      Write-Host "Starting Docker service..."
-      Start-Service com.docker.service
-      Start-Sleep -Seconds 20
-    }
-
-- name: Ensure Docker Is Ready
-  run: |
-    $maxAttempts = 6
-
-    for ($i = 1; $i -le $maxAttempts; $i++) {
-
-      docker version
-
-      if ($LASTEXITCODE -eq 0) {
-        Write-Host "Docker is ready"
-        exit 0
+      if ($service -and $service.Status -ne 'Running') {
+        Write-Host "Starting Docker service..."
+        Start-Service com.docker.service
+        Start-Sleep -Seconds 20
       }
 
-      Write-Host "Waiting for Docker..."
-      Start-Sleep -Seconds 10
-    }
+  - name: Ensure Docker Is Ready
+    run: |
+      $maxAttempts = 6
 
-    Write-Host "Docker failed to start"
-    exit 1
+      for ($i = 1; $i -le $maxAttempts; $i++) {
 
-- name: Build Docker Image
-  run: docker build -t jmeter-demo:v1 .
+        docker version
 
-- name: Verify Image
-  run: docker images
+        if ($LASTEXITCODE -eq 0) {
+          Write-Host "Docker is ready"
+          break
+        }
 
-- name: Verify Secret Exists
-  run: |
-    $token = "${{ secrets.GHCR_TOKEN }}"
-    Write-Host "Token Length = $($token.Length)"
+        Write-Host "Waiting for Docker..."
+        Start-Sleep -Seconds 10
 
-- name: Login To GHCR
-  run: |
-    $token = "${{ secrets.GHCR_TOKEN }}"
-    $token | docker login ghcr.io -u PraveenNageswaran --password-stdin
+        if ($i -eq $maxAttempts) {
+          Write-Host "Docker failed to start"
+          exit 1
+        }
+      }
 
-- name: Tag Image
-  run: docker tag jmeter-demo:v1 ghcr.io/praveennageswaran/jmeter-demo:v1
+  - name: Build Docker Image
+    run: docker build -t jmeter-demo:v1 .
 
-- name: Push Image
-  run: docker push ghcr.io/praveennageswaran/jmeter-demo:v1
+  - name: Verify Image
+    run: docker images
+
+  - name: Verify Secret Exists
+    run: |
+      $token = "${{ secrets.GHCR_TOKEN }}"
+      Write-Host "Token Length = $($token.Length)"
+
+  - name: Login To GHCR
+    run: |
+      $token = "${{ secrets.GHCR_TOKEN }}"
+      $token | docker login ghcr.io -u PraveenNageswaran --password-stdin
+
+  - name: Tag Image
+    run: docker tag jmeter-demo:v1 ghcr.io/praveennageswaran/jmeter-demo:v1
+
+  - name: Push Image
+    run: docker push ghcr.io/praveennageswaran/jmeter-demo:v1
 ```

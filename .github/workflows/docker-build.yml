@@ -7,7 +7,6 @@ jobs:
 build:
 runs-on: self-hosted
 
-```
 steps:
   - name: Checkout Repository
     uses: actions/checkout@v4
@@ -65,4 +64,3 @@ steps:
 
   - name: Push Image
     run: docker push ghcr.io/praveennageswaran/jmeter-demo:v1
-```

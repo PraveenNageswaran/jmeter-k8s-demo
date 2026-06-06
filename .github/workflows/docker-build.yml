@@ -1,4 +1,4 @@
-name: Build Run And Push JMeter
+name: Build And Run JMeter
 
 on:
 workflow_dispatch:
@@ -12,17 +12,7 @@ steps:
   - name: Checkout Repository
     uses: actions/checkout@v4
 
-  - name: Start Docker Service
-    run: |
-      $service = Get-Service com.docker.service -ErrorAction SilentlyContinue
-
-      if ($service -and $service.Status -ne 'Running') {
-        Write-Host "Starting Docker service..."
-        Start-Service com.docker.service
-        Start-Sleep -Seconds 20
-      }
-
-  - name: Verify Docker
+  - name: Show Docker Version
     run: docker version
 
   - name: Build Docker Image
@@ -31,19 +21,6 @@ steps:
   - name: Verify Image
     run: docker images
 
-  - name: Verify Secret Exists
-    run: |
-      $token = "${{ secrets.GHCR_TOKEN }}"
-      Write-Host "Token Length = $($token.Length)"
-
-  - name: Login To GHCR
-    run: |
-      $token = "${{ secrets.GHCR_TOKEN }}"
-      $token | docker login ghcr.io -u PraveenNageswaran --password-stdin
-
-  - name: Tag Image
-    run: docker tag jmeter-demo:v1 ghcr.io/praveennageswaran/jmeter-demo:v1
-
-  - name: Push Image
-    run: docker push ghcr.io/praveennageswaran/jmeter-demo:v1
+  - name: Run JMeter Container
+    run: docker run --rm jmeter-demo:v1
 ```

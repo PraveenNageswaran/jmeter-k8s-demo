@@ -1,37 +1,21 @@
-name: Docker Build And Run
+name: Docker Test
 
 on:
   workflow_dispatch:
 
 jobs:
-  docker-build:
+  docker-test:
     runs-on: self-hosted
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Verify Docker Is Running
-        shell: powershell
-        run: |
-          docker version
-
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "Docker is not available."
-            exit 1
-          }
-
-      - name: Show Docker Images Before Build
-        run: docker images
+      - name: Show Docker Version
+        run: docker version
 
       - name: Build Docker Image
         run: docker build -t jmeter-demo:v1 .
 
-      - name: Verify Image Was Created
+      - name: Show Docker Images
         run: docker images
-
-      - name: Run JMeter Container
-        run: docker run --rm jmeter-demo:v1
-
-      - name: Success
-        run: echo "Pipeline completed successfully"

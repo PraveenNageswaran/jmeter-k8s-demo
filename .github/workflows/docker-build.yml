@@ -1,26 +1,12 @@
-name: Build And Run JMeter
+name: Test
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-build:
-runs-on: self-hosted
+  test:
+    runs-on: self-hosted
 
-```
-steps:
-  - name: Checkout Repository
-    uses: actions/checkout@v4
-
-  - name: Show Docker Version
-    run: docker version
-
-  - name: Build Docker Image
-    run: docker build -t jmeter-demo:v1 .
-
-  - name: Verify Image
-    run: docker images
-
-  - name: Run JMeter Container
-    run: docker run --rm jmeter-demo:v1
-```
+    steps:
+      - name: Hello
+        run: echo Hello

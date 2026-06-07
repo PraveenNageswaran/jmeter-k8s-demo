@@ -1,12 +1,52 @@
-name: Test
+name: Docker Build And Run
 
 on:
-  workflow_dispatch:
+workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: self-hosted
+docker-build:
+runs-on: self-hosted
 
-    steps:
-      - name: Hello
-        run: echo Hello
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
+
+  - name: Start Docker Service If Available
+    run: |
+      $service = Get-Service com.docker.service -ErrorAction SilentlyContinue
+
+      if ($service) {
+        if ($service.Status -ne 'Running') {
+          Write-Host "Starting Docker service..."
+          Start-Service com.docker.service
+          Start-Sleep -Seconds 20
+        }
+      }
+      else {
+        Write-Host "Docker service not found. Assuming Docker Desktop manages Docker."
+      }
+
+  - name: Verify Docker Is Running
+    run: |
+      docker version
+
+      if ($LASTEXITCODE -ne 0) {
+        Write-Host "Docker is not available."
+        exit 1
+      }
+
+  - name: Show Docker Images Before Build
+    run: docker images
+
+  - name: Build Docker Image
+    run: docker build -t jmeter-demo:v1 .
+
+  - name: Verify Image Was Created
+    run: docker images
+
+  - name: Run JMeter Container
+    run: docker run --rm jmeter-demo:v1
+
+  - name: Success
+    run: echo Pipeline completed successfully
+

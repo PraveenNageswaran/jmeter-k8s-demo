@@ -11,40 +11,37 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Build Docker Image
-        run: docker build -t jmeter-demo:v1 .
-
       - name: Remove Old Containers
         shell: powershell
         run: |
-          docker rm -f jmeter-test-1 2>$null
-          docker rm -f jmeter-test-2 2>$null
-          docker rm -f jmeter-test-3 2>$null
+          docker rm -f jmeter-test-1
+          docker rm -f jmeter-test-2
+          docker rm -f jmeter-test-3
 
-      - name: Start JMeter Test 1
+      - name: Build Docker Image
+        run: docker build -t jmeter-demo:v1 .
+
+      - name: Start JMeter Container 1
         run: docker run -d --name jmeter-test-1 jmeter-demo:v1
 
-      - name: Start JMeter Test 2
+      - name: Start JMeter Container 2
         run: docker run -d --name jmeter-test-2 jmeter-demo:v1
 
-      - name: Start JMeter Test 3
+      - name: Start JMeter Container 3
         run: docker run -d --name jmeter-test-3 jmeter-demo:v1
 
-      - name: Show Running Containers
+      - name: Wait 10 Seconds
+        shell: powershell
+        run: Start-Sleep -Seconds 10
+
+      - name: Show Containers
         run: docker ps -a
 
-      - name: Wait 20 Seconds
-        shell: powershell
-        run: Start-Sleep -Seconds 20
+      - name: Show Logs Test 1
+        run: docker logs jmeter-test-1
 
-      - name: Show Container Logs
-        shell: powershell
-        run: |
-          echo "===== TEST 1 ====="
-          docker logs jmeter-test-1
+      - name: Show Logs Test 2
+        run: docker logs jmeter-test-2
 
-          echo "===== TEST 2 ====="
-          docker logs jmeter-test-2
-
-          echo "===== TEST 3 ====="
-          docker logs jmeter-test-3
+      - name: Show Logs Test 3
+        run: docker logs jmeter-test-3

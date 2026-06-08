@@ -4,25 +4,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-docker:
+  run-parallel:
     runs-on: self-hosted
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Build Docker Image
         run: docker build -t jmeter-demo:v1 .
 
-  run-jmeter:
-    needs: build-docker
-    runs-on: self-hosted
-
-    strategy:
-      matrix:
-        container_id: [1, 2, 3]
-
-    steps:
-      - name: Run JMeter Container
+      - name: Launch 3 Parallel JMeter Containers
+        shell: powershell
         run: |
-          docker run --rm --name test${{ matrix.container_id }} jmeter-demo:v1
+          docker run -d --name jmeter-test-1 jmeter-demo:v1
+          docker run -d --name jmeter-test-2 jmeter-demo:v1
+          docker run -d --name jmeter-test-3 jmeter-demo:v1
+
+      - name: Show Containers
+        run: docker ps -a

@@ -1,10 +1,10 @@
-name: Docker Parallel Containers
+name: JMeter Parallel Run
 
 on:
   workflow_dispatch:
 
 jobs:
-  run-parallel:
+  build-docker:
     runs-on: self-hosted
 
     steps:
@@ -14,20 +14,15 @@ jobs:
       - name: Build Docker Image
         run: docker build -t jmeter-demo:v1 .
 
-      - name: Start Container 1
-        run: docker run -d --name test1 jmeter-demo:v1
+  run-jmeter:
+    needs: build-docker
+    runs-on: self-hosted
 
-      - name: Start Container 2
-        run: docker run -d --name test2 jmeter-demo:v1
+    strategy:
+      matrix:
+        container_id: [1, 2, 3]
 
-      - name: Start Container 3
-        run: docker run -d --name test3 jmeter-demo:v1
-
-      - name: Show Running Containers
-        run: docker ps
-
-      - name: Stop Containers
-        run: docker stop test1 test2 test3
-
-      - name: Remove Containers
-        run: docker rm test1 test2 test3
+    steps:
+      - name: Run JMeter Container
+        run: |
+          docker run --rm --name test${{ matrix.container_id }} jmeter-demo:v1

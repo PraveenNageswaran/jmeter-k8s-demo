@@ -1,4 +1,4 @@
-name: Docker Build And Run
+name: Docker Parallel Run
 
 on:
   workflow_dispatch:
@@ -14,16 +14,26 @@ jobs:
       - name: Build Docker Image
         run: docker build -t jmeter-demo:v1 .
 
-      - name: Verify Docker Image
-        run: docker images
-
-  run-container:
+  run-test-1:
     runs-on: self-hosted
     needs: build-docker
 
     steps:
-      - name: Show Docker Images
-        run: docker images
+      - name: Run Container 1
+        run: docker run --rm jmeter-demo:v1
 
-      - name: Run JMeter Container
+  run-test-2:
+    runs-on: self-hosted
+    needs: build-docker
+
+    steps:
+      - name: Run Container 2
+        run: docker run --rm jmeter-demo:v1
+
+  run-test-3:
+    runs-on: self-hosted
+    needs: build-docker
+
+    steps:
+      - name: Run Container 3
         run: docker run --rm jmeter-demo:v1

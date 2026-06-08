@@ -1,4 +1,4 @@
-name: Docker Build
+name: Docker Build And Run
 
 on:
   workflow_dispatch:
@@ -16,3 +16,14 @@ jobs:
 
       - name: Verify Docker Image
         run: docker images
+
+  run-container:
+    runs-on: self-hosted
+    needs: build-docker
+
+    steps:
+      - name: Show Docker Images
+        run: docker images
+
+      - name: Run JMeter Container
+        run: docker run --rm jmeter-demo:v1

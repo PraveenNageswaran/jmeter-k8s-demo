@@ -8,17 +8,43 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Build Docker Image
         run: docker build -t jmeter-demo:v1 .
 
-      - name: Launch 3 Parallel JMeter Containers
+      - name: Remove Old Containers
         shell: powershell
         run: |
-          docker run -d --name jmeter-test-1 jmeter-demo:v1
-          docker run -d --name jmeter-test-2 jmeter-demo:v1
-          docker run -d --name jmeter-test-3 jmeter-demo:v1
+          docker rm -f jmeter-test-1 2>$null
+          docker rm -f jmeter-test-2 2>$null
+          docker rm -f jmeter-test-3 2>$null
 
-      - name: Show Containers
+      - name: Start JMeter Test 1
+        run: docker run -d --name jmeter-test-1 jmeter-demo:v1
+
+      - name: Start JMeter Test 2
+        run: docker run -d --name jmeter-test-2 jmeter-demo:v1
+
+      - name: Start JMeter Test 3
+        run: docker run -d --name jmeter-test-3 jmeter-demo:v1
+
+      - name: Show Running Containers
         run: docker ps -a
+
+      - name: Wait 20 Seconds
+        shell: powershell
+        run: Start-Sleep -Seconds 20
+
+      - name: Show Container Logs
+        shell: powershell
+        run: |
+          echo "===== TEST 1 ====="
+          docker logs jmeter-test-1
+
+          echo "===== TEST 2 ====="
+          docker logs jmeter-test-2
+
+          echo "===== TEST 3 ====="
+          docker logs jmeter-test-3

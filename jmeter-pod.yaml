@@ -7,5 +7,7 @@ metadata:
 spec:
   containers:
   - name: jmeter
-    image: localhost/my-jmeter:latest
-    imagePullPolicy: IfNotPresent
+    image: 060119698736.dkr.ecr.ap-south-1.amazonaws.com/terraform-demo:v1
+    imagePullPolicy: Always
+
+  restartPolicy: Never
